@@ -57,9 +57,10 @@ class UserService(
     val persistedUsername = refreshTokenRepository.findUsernameByToken(token)
 
     return if (decodedRefreshToken != null && persistedUsername != null) {
+      val foundUser: User? = userRepository.findByUsername(persistedUsername)
       val usernameFromRefreshToken: String? = decodedRefreshToken.getClaim("username").asString()
 
-      if (usernameFromRefreshToken == persistedUsername)
+      if (foundUser != null && usernameFromRefreshToken == foundUser.username)
         jwtService.createAccessToken(persistedUsername)
       else
         null
